@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Image, StyleSheet, Platform, View, TurboModuleRegistry, Button } from 'react-native';
 
 import * as Notifications from 'expo-notifications';
 
 export default function HomeScreen() {
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
+
   useEffect(() => {
+    //通知許可の要求
     const requestPermissions = async () => {
       try {
         const status = await Notifications.requestPermissionsAsync({
@@ -15,13 +19,33 @@ export default function HomeScreen() {
             allowAnnouncements: true,
           },
         });
-        console.log(status);
+        console.log('status', status);
       } catch (error) {
         console.error(error);
       }
     };
-
     requestPermissions();
+
+    //通知リスナーの設定
+    //通知オブジェクト
+    notificationListener.current = Notifications.addNotificationReceivedListener(
+      async (notification) => {
+        console.log('notification', notification);
+        alert(notification.request.content.body);
+      }
+    );
+
+    //レスポンスオブジェク
+    responseListener.current = Notifications.addNotificationReceivedListener((response) => {
+      console.log('response', response);
+      alert(response.request.content.data.data);
+    });
+
+    //リスナーのクリーンアップ
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current!);
+      Notifications.removeNotificationSubscription(responseListener.current!);
+    };
   }, []);
 
   const onScheduleNotifications = async () => {
