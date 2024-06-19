@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Image, StyleSheet, Platform, View, TurboModuleRegistry, Button } from 'react-native';
+import { StyleSheet, View, Button } from 'react-native';
 
 import * as Notifications from 'expo-notifications';
 
