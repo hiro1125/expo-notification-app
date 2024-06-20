@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { StyleSheet, View, Button } from 'react-native';
-
 import * as Notifications from 'expo-notifications';
 
 export default function HomeScreen() {
@@ -8,10 +7,10 @@ export default function HomeScreen() {
   const responseListener = useRef<Notifications.Subscription>();
 
   useEffect(() => {
-    //通知許可の要求
+    // 通知許可の要求
     const requestPermissions = async () => {
       try {
-        const status = await Notifications.requestPermissionsAsync({
+        const { status } = await Notifications.requestPermissionsAsync({
           ios: {
             allowAlert: true,
             allowBadge: true,
@@ -19,32 +18,42 @@ export default function HomeScreen() {
             allowAnnouncements: true,
           },
         });
-        console.log('status', status);
+        // 許可ステータスの処理が必要な場合
+        // console.log('status', status);
       } catch (error) {
         console.error(error);
       }
     };
     requestPermissions();
 
-    //通知リスナーの設定
-    //通知オブジェクト
+    // 通知リスナーの設定
     notificationListener.current = Notifications.addNotificationReceivedListener(
       async (notification) => {
-        console.log('notification', notification);
-        alert(notification.request.content.body);
+        // 受信した通知の処理
+        // console.log('notification', notification);
+        const count = await Notifications.getBadgeCountAsync();
+        await Notifications.setBadgeCountAsync(count + 1);
       }
     );
 
-    //レスポンスオブジェク
-    responseListener.current = Notifications.addNotificationReceivedListener((response) => {
-      console.log('response', response);
-      alert(response.request.content.data.data);
-    });
+    // 応答リスナーの設定
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(
+      async (response) => {
+        // 通知応答の処理
+        // console.log('response', response);
+        await Notifications.dismissAllNotificationsAsync();
+        await Notifications.setBadgeCountAsync(0);
+      }
+    );
 
-    //リスナーのクリーンアップ
+    // コンポーネントのアンマウント時にリスナーをクリーンアップ
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current!);
-      Notifications.removeNotificationSubscription(responseListener.current!);
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
     };
   }, []);
 
