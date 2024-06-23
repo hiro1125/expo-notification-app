@@ -19,7 +19,6 @@ export default function HomeScreen() {
           },
         });
         // 許可ステータスの処理が必要な場合
-        // console.log('status', status);
       } catch (error) {
         console.error(error);
       }
@@ -30,7 +29,6 @@ export default function HomeScreen() {
     notificationListener.current = Notifications.addNotificationReceivedListener(
       async (notification) => {
         // 受信した通知の処理
-        // console.log('notification', notification);
         const count = await Notifications.getBadgeCountAsync();
         await Notifications.setBadgeCountAsync(count + 1);
       }
@@ -40,7 +38,6 @@ export default function HomeScreen() {
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
       async (response) => {
         // 通知応答の処理
-        // console.log('response', response);
         await Notifications.dismissAllNotificationsAsync();
         await Notifications.setBadgeCountAsync(0);
       }
