@@ -68,7 +68,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Button
-        title='テスト'
+        title='通知設定'
         onPress={onScheduleNotifications}
       />
     </View>
